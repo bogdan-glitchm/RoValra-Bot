@@ -2,7 +2,7 @@ import { githubRequest, GitHubConfig } from "./github";
 import { applyEdits, modify } from "jsonc-parser";
 
 const SOURCE_OWNER = "NotValra";
-const TARGET_OWNER = "bogdan-glitchm";
+const TARGET_OWNER = "NotValra";
 const REPO = "RoValra";
 const BASE_BRANCH = "main";
 
