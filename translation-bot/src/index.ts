@@ -6,12 +6,40 @@ export interface Env {
     GITHUB_PRIVATE_KEY: string;
 }
 
+function corsHeaders(): HeadersInit {
+    return {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+    };
+}
+
+function jsonResponse(
+    data: unknown,
+    status = 200,
+): Response {
+    return Response.json(data, {
+        status,
+        headers: corsHeaders(),
+    });
+}
+
 export default {
     async fetch(
         request: Request,
         env: Env,
     ): Promise<Response> {
         const url = new URL(request.url);
+
+        if (
+            url.pathname === "/translation" &&
+            request.method === "OPTIONS"
+        ) {
+            return new Response(null, {
+                status: 204,
+                headers: corsHeaders(),
+            });
+        }
 
         if (
             url.pathname === "/translation" &&
@@ -33,35 +61,32 @@ export default {
                     },
                 );
 
-                return Response.json(
+                return jsonResponse(
                     {
                         success: true,
                         message: "Translation submitted!",
                         ...result,
                     },
-                    {
-                        status: 201,
-                    },
+                    201,
                 );
             } catch (error) {
                 console.error(error);
 
-                return Response.json(
+                return jsonResponse(
                     {
                         success: false,
                         error: error instanceof Error
                             ? error.message
                             : String(error),
                     },
-                    {
-                        status: 500,
-                    },
+                    500,
                 );
             }
         }
 
         return new Response("Not Found", {
             status: 404,
+            headers: corsHeaders(),
         });
     },
 };
